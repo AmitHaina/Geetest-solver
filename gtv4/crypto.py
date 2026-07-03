@@ -1,16 +1,3 @@
-"""
-Payload encryption — produces the ``w`` parameter.
-
-For ``pt == "1"`` the scheme is:
-
-    uid      = 16 random hex chars
-    aes_part = AES-CBC(PKCS7(plaintext), key=uid, iv="0000000000000000")
-    rsa_part = RSA/PKCS1v1.5(uid)              # server decrypts to recover uid
-    w        = hex(aes_part) + hex(rsa_part)
-
-For ``pt`` of ``0``/empty the plaintext is simply URL-encoded.
-"""
-
 from __future__ import annotations
 
 import binascii
@@ -30,7 +17,6 @@ _RSA = PKCS1_v1_5.new(_PUBLIC_KEY)
 
 
 def _new_uid() -> str:
-    """A 16-hex-character session key."""
     return secrets.token_hex(8)
 
 
@@ -45,7 +31,6 @@ def _rsa_hex(uid: str) -> str:
 
 
 def encrypt_w(plaintext: str, pt: str) -> str:
-    """Encrypt the assembled payload into the ``w`` request parameter."""
     if not pt or pt == "0":
         return quote_plus(plaintext)
 

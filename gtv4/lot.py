@@ -1,14 +1,3 @@
-"""
-Lot-number derivation.
-
-Geetest embeds a dynamic key/value entry in the payload that is built by
-picking specific characters out of ``lot_number``. The selection rule is a
-constant extracted from the client script (see ``settings.LOT_MAPPING``).
-
-A term looks like ``n[a:b]+n[c:d]`` where each ``n[a:b]`` contributes
-``lot_number[a:b+1]`` (inclusive end) and ``+`` concatenates them.
-"""
-
 from __future__ import annotations
 
 import re
@@ -35,7 +24,6 @@ def build_lot_entry(
     lot_number: str,
     mapping: dict[str, str] | None = None,
 ) -> dict[str, str]:
-    """Return the ``{derived_key: derived_value}`` entry for ``lot_number``."""
     mapping = mapping or settings.LOT_MAPPING
     return {
         _expand(key_spec, lot_number): _expand(value_spec, lot_number)

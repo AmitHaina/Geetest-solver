@@ -1,11 +1,3 @@
-"""
-Payload assembly.
-
-Builds the plaintext object that gets encrypted into ``w``. It combines the
-proof-of-work result, the lot-derived entry, the static anti-bot fields, and
-the risk-type specific solution (e.g. the slide position).
-"""
-
 from __future__ import annotations
 
 import copy
@@ -15,11 +7,6 @@ from . import lot, powork, settings
 
 
 def build(challenge, solution: dict[str, Any]) -> dict[str, Any]:
-    """Assemble the payload dict for a solved ``challenge``.
-
-    ``solution`` carries the risk-type specific fields (for slide:
-    ``setLeft``, ``passtime``, ``userresponse``).
-    """
     pow_result = powork.solve(challenge)
 
     return {

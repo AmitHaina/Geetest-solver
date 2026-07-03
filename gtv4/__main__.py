@@ -1,10 +1,3 @@
-"""
-Command-line entry point.
-
-    python -m gtv4            # solve the public slide demo
-    python -m gtv4 <captcha_id> <risk_type> [proxy]
-"""
-
 from __future__ import annotations
 
 import json
@@ -12,7 +5,6 @@ import sys
 
 from . import solver
 
-# Public Geetest v4 slide demo.
 _DEMO_CAPTCHA_ID = "54088bb07d2df3c46b79f80300b0abbe"
 _DEMO_RISK_TYPE = "slide"
 

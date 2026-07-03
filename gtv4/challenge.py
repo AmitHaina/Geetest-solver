@@ -1,10 +1,3 @@
-"""
-Challenge loading and parsing.
-
-Wraps the ``/load`` call and exposes the fields the rest of the solver needs
-through a small dataclass, keeping the raw payload available for anything else.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -12,18 +5,15 @@ import uuid
 from dataclasses import dataclass
 from typing import Any
 
-from . import settings, util
+from . import settings, transport, util
 
 log = logging.getLogger(__name__)
 
-# Fields every challenge must carry for the verify step to work.
 _REQUIRED_FIELDS = ("lot_number", "process_token", "payload", "pt", "pow_detail")
 
 
 @dataclass
 class Challenge:
-    """A parsed Geetest v4 challenge returned by ``/load``."""
-
     captcha_id: str
     risk_type: str
     raw: dict[str, Any]
@@ -61,7 +51,6 @@ def load_challenge(
     lang: str = "eng",
     timeout: int = 15,
 ) -> Challenge:
-    """Request a fresh challenge from ``/load`` and parse it."""
     callback = util.make_callback()
     params = {
         "captcha_id": captcha_id,
@@ -72,7 +61,8 @@ def load_challenge(
         "callback": callback,
     }
 
-    response = session.get(
+    response = transport.get_with_retry(
+        session,
         settings.API_HOST + settings.LOAD_PATH,
         params=params,
         headers=settings.DEFAULT_HEADERS,

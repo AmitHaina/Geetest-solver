@@ -1,5 +1,3 @@
-"""Small shared helpers."""
-
 from __future__ import annotations
 
 import json
@@ -8,12 +6,10 @@ import time
 
 
 def make_callback() -> str:
-    """Build a JSONP callback name in the format Geetest expects."""
     return f"geetest_{int(random.random() * 10000) + int(time.time() * 1000)}"
 
 
 def parse_jsonp(text: str, callback: str) -> dict:
-    """Unwrap a ``callback({...})`` JSONP body into its JSON object."""
     marker = f"{callback}("
     start = text.find(marker)
     if start == -1:

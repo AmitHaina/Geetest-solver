@@ -1,15 +1,3 @@
-"""
-Orchestrator — ties the pieces together into a full solve.
-
-Flow:
-
-    load  ->  solve challenge  ->  build payload  ->  encrypt w  ->  verify
-
-``verify`` returns the ``seccode`` the calling site forwards to the protected
-backend. Risk types are dispatched through the solver ``registry``; importing
-the built-in solver modules is what populates it.
-"""
-
 from __future__ import annotations
 
 import json
@@ -20,7 +8,7 @@ from typing import Any
 from . import payload as payload_mod
 from . import challenge as challenge_mod
 from . import crypto, registry, settings, transport, util
-from . import slide  # noqa: F401  -- registers the "slide" solver
+from . import slide # noqa: F401
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +19,6 @@ def _solve_challenge(session, challenge, timeout: int) -> dict[str, Any]:
 
 
 def verify(session, challenge, solution: dict[str, Any], timeout: int = 15) -> dict[str, Any]:
-    """Submit a solved challenge to ``/verify`` and return the seccode."""
     base = payload_mod.build(challenge, solution)
     w = crypto.encrypt_w(json.dumps(base), challenge.pt)
 
@@ -50,7 +37,8 @@ def verify(session, challenge, solution: dict[str, Any], timeout: int = 15) -> d
     }
 
     started = time.perf_counter()
-    response = session.get(
+    response = transport.get_with_retry(
+        session,
         settings.API_HOST + settings.VERIFY_PATH,
         params=params,
         headers=settings.DEFAULT_HEADERS,
@@ -83,12 +71,6 @@ def solve(
     timeout: int = 15,
     session=None,
 ) -> dict[str, Any]:
-    """Run a full solve and return the ``seccode`` object.
-
-    Builds and closes its own session unless a ``session`` is supplied, in
-    which case it is reused and left open (for connection pooling). Pass a
-    ``proxy`` to route traffic through one.
-    """
     own_session = session is None
     if own_session:
         session = transport.build_session(proxy=proxy, verify=verify_tls)
